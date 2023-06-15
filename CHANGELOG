@@ -1,3 +1,7 @@
+Version 0.1.1 (2023-06-15)
+--------------------------
+Add ability to connect to a PostgreSQL instance over vnet rules (#3)
+
 Version 0.1.0 (2023-06-09)
 --------------------------
 Add base vnet deployment for a Snowplow stack (#2)
