@@ -26,18 +26,26 @@ variable "subnets" {
       address_prefix = "10.0.1.0/24"
     },
     {
-      name           = "igluserver-agw1"
-      address_prefix = "10.0.10.0/24"
+      name           = "iglu-agw1"
+      address_prefix = "10.0.2.0/24"
     },
     {
-      name           = "igluserver-db1"
-      address_prefix = "10.0.11.0/24"
-    },
-    {
-      name           = "public1"
+      name           = "pipeline1"
       address_prefix = "10.0.20.0/24"
+    },
+    {
+      name           = "iglu1"
+      address_prefix = "10.0.21.0/24"
     }
   ]
+}
+
+variable "subnet_service_endpoints" {
+  type = map(any)
+  default = {
+    iglu1 = ["Microsoft.Sql"]
+  }
+  description = "A map of subnet name to service endpoints to add to the subnet."
 }
 
 variable "tags" {
