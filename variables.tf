@@ -36,6 +36,10 @@ variable "subnets" {
     {
       name           = "iglu1"
       address_prefix = "10.0.21.0/24"
+    },
+    {
+      name           = "iglu-vmss1"
+      address_prefix = "10.0.22.0/24"
     }
   ]
 }
@@ -43,9 +47,21 @@ variable "subnets" {
 variable "subnet_service_endpoints" {
   type = map(any)
   default = {
-    iglu1 = ["Microsoft.Sql"]
+    iglu1 = ["Microsoft.Storage"]
   }
   description = "A map of subnet name to service endpoints to add to the subnet."
+}
+
+variable "subnet_delegations" {
+  type = map(any)
+  default = {
+    iglu1 = {
+      name         = "PostgreSQL"
+      service_name = "Microsoft.DBforPostgreSQL/flexibleServers"
+      actions      = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
+    }
+  }
+  description = "A map of subnet name to delegation configuration."
 }
 
 variable "tags" {

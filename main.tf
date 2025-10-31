@@ -23,6 +23,17 @@ resource "azurerm_subnet" "subnet" {
   resource_group_name  = var.resource_group_name
   virtual_network_name = azurerm_virtual_network.vnet.name
   service_endpoints    = lookup(var.subnet_service_endpoints, each.value.name, null)
+
+  dynamic "delegation" {
+    for_each = lookup(var.subnet_delegations, each.value.name, null) != null ? [lookup(var.subnet_delegations, each.value.name)] : []
+    content {
+      name = delegation.value.name
+      service_delegation {
+        name    = delegation.value.service_name
+        actions = delegation.value.actions
+      }
+    }
+  }
 }
 
 locals {
