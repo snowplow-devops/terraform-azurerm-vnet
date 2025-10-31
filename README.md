@@ -17,6 +17,29 @@ module "pipeline_vnet" {
 }
 ```
 
+### Subnet Delegation
+
+To delegate a subnet to a specific Azure service (e.g., PostgreSQL Flexible Server), use the `subnet_delegations` variable:
+
+```hcl
+module "pipeline_vnet" {
+  source = "snowplow-devops/vnet/azurerm"
+
+  name                = "pipeline-vnet"
+  resource_group_name = "pipeline"
+
+  subnet_delegations = {
+    iglu1 = {
+      name         = "PostgreSQL"
+      service_name = "Microsoft.DBforPostgreSQL/flexibleServers"
+      actions      = ["Microsoft.Network/virtualNetworks/subnets/join/action"]
+    }
+  }
+}
+```
+
+**Note**: Subnet delegation gives full control of a subnet to a specific Azure service and is different from service endpoints. When using delegation for a subnet, you typically don't need service endpoints for that same subnet.
+
 ## Requirements
 
 | Name | Version |
@@ -49,8 +72,9 @@ No modules.
 | <a name="input_name"></a> [name](#input\_name) | A name which will be pre-pended to the resources created | `string` | n/a | yes |
 | <a name="input_resource_group_name"></a> [resource\_group\_name](#input\_resource\_group\_name) | The name of the resource group to deploy the vNet into | `string` | n/a | yes |
 | <a name="input_address_space"></a> [address\_space](#input\_address\_space) | The root CIDR range to be used for the vNet deployment | `string` | `"10.0.0.0/16"` | no |
-| <a name="input_subnet_service_endpoints"></a> [subnet\_service\_endpoints](#input\_subnet\_service\_endpoints) | A map of subnet name to service endpoints to add to the subnet. | `map(any)` | <pre>{<br>  "iglu1": [<br>    "Microsoft.Sql"<br>  ]<br>}</pre> | no |
-| <a name="input_subnets"></a> [subnets](#input\_subnets) | A list of public subnets inside the vNet | <pre>list(object({<br>    name           = string<br>    address_prefix = string<br>  }))</pre> | <pre>[<br>  {<br>    "address_prefix": "10.0.1.0/24",<br>    "name": "collector-agw1"<br>  },<br>  {<br>    "address_prefix": "10.0.2.0/24",<br>    "name": "iglu-agw1"<br>  },<br>  {<br>    "address_prefix": "10.0.20.0/24",<br>    "name": "pipeline1"<br>  },<br>  {<br>    "address_prefix": "10.0.21.0/24",<br>    "name": "iglu1"<br>  }<br>]</pre> | no |
+| <a name="input_subnet_delegations"></a> [subnet\_delegations](#input\_subnet\_delegations) | A map of subnet name to delegation configuration. | `map(any)` | <pre>{<br/>  "iglu1": {<br/>    "actions": [<br/>      "Microsoft.Network/virtualNetworks/subnets/join/action"<br/>    ],<br/>    "name": "PostgreSQL",<br/>    "service_name": "Microsoft.DBforPostgreSQL/flexibleServers"<br/>  }<br/>}</pre> | no |
+| <a name="input_subnet_service_endpoints"></a> [subnet\_service\_endpoints](#input\_subnet\_service\_endpoints) | A map of subnet name to service endpoints to add to the subnet. | `map(any)` | <pre>{<br/>  "iglu1": [<br/>    "Microsoft.Storage"<br/>  ]<br/>}</pre> | no |
+| <a name="input_subnets"></a> [subnets](#input\_subnets) | A list of public subnets inside the vNet | <pre>list(object({<br/>    name           = string<br/>    address_prefix = string<br/>  }))</pre> | <pre>[<br/>  {<br/>    "address_prefix": "10.0.1.0/24",<br/>    "name": "collector-agw1"<br/>  },<br/>  {<br/>    "address_prefix": "10.0.2.0/24",<br/>    "name": "iglu-agw1"<br/>  },<br/>  {<br/>    "address_prefix": "10.0.20.0/24",<br/>    "name": "pipeline1"<br/>  },<br/>  {<br/>    "address_prefix": "10.0.21.0/24",<br/>    "name": "iglu1"<br/>  },<br/>  {<br/>    "address_prefix": "10.0.22.0/24",<br/>    "name": "iglu-vmss1"<br/>  }<br/>]</pre> | no |
 | <a name="input_tags"></a> [tags](#input\_tags) | The tags to append to this resource | `map(string)` | `{}` | no |
 
 ## Outputs
@@ -64,7 +88,7 @@ No modules.
 
 # Copyright and license
 
-The Azurerm VNet project is Copyright 2023-2023 Snowplow Analytics Ltd.
+The Azurerm VNet project is Copyright 2023-current Snowplow Analytics Ltd.
 
 Licensed under the [Snowplow Community License](https://docs.snowplow.io/community-license-1.0). _(If you are uncertain how it applies to your use case, check our answers to [frequently asked questions](https://docs.snowplow.io/docs/contributing/community-license-faq/).)_
 
